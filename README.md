@@ -6,7 +6,8 @@ It wraps the original Promise with the same signature while it implements some c
 - [lix](https://github.com/lix-pm/lix.client)
 
 # Install
-`lix install gh:grosmar/tink_cache`
+- `lix install gh:grosmar/tink_cache`
+- add to your build.hxml: `-lib tink_cache`
 
 # Usage
 Simple ttl caching:
