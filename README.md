@@ -1,4 +1,5 @@
 # tink_cache
+[![Build Status](https://travis-ci.org/grosmar/tink_cache.svg?branch=master)](https://travis-ci.org/grosmar/tink_cache.svg?branch=master)
 Haxe caching based on tink_promise
 It wraps the original Promise with the same signature while it implements some caching logic inside itself.
 
