@@ -5,6 +5,7 @@ class HashMap<K, V>
 	var _keys			: Map<String, V>;
 	var _values			: Map<String, K>;
 	var _size			: Int;
+	var _hashCodeFactory = new HashCodeFactory();
 
 	public function new()
 	{
@@ -173,7 +174,7 @@ class HashMap<K, V>
 		}
 		else
 		{
-			s = '_O' + HashCodeFactory.getKey(o );
+			s = '_O' + _hashCodeFactory.getKey(o );
 		}
 
 		return s;
@@ -182,7 +183,7 @@ class HashMap<K, V>
 	function _removeName( o : Dynamic ) : Void
 	{
 		if ( !Std.is( o, String ) && !Std.is( o, Bool ) && !Std.is( o, Float ))
-			HashCodeFactory.removeKey(o );
+			_hashCodeFactory.removeKey(o );
 	}
 
 	/**
@@ -218,11 +219,10 @@ class HashMap<K, V>
 			{
 				var sVID : String = this._getName( this._keys[ sKID ] );
 				var value : V = this._keys.get( sKID );
+				this._removeName( this._keys[ sKID ] );
 				this._values.remove( sVID );
 				this._keys.remove( sKID );
 				this._size--;
-
-				this._removeName( this._keys[ sKID ] );
 
 				return value;
 			}
@@ -277,36 +277,41 @@ class HashMap<K, V>
 @:final
 class HashCodeFactory
 {
-	static var _nKEY    : Int               = 0;
-	static var _M       = new Map<{}, Int>();
+	var _nKEY    : Int               = 0;
+	var _M       = new Map<{}, Int>();
 
-	public static function getNextKEY() : Int
+	public function new()
 	{
-		return HashCodeFactory._nKEY++;
+
 	}
 
-	public static function getNextName() : String
+	public function getNextKEY() : Int
 	{
-		return "" + HashCodeFactory._nKEY;
+		return _nKEY++;
 	}
 
-	public static function getKey( o : Dynamic ) : Int
+	public function getNextName() : String
 	{
-		if ( !HashCodeFactory._M.exists(o ) )
+		return "" + _nKEY;
+	}
+
+	public function getKey( o : Dynamic ) : Int
+	{
+		if ( !_M.exists(o ) )
 		{
-			HashCodeFactory._M.set(o, HashCodeFactory.getNextKEY() );
+			_M.set(o, getNextKEY() );
 		}
 
-		return HashCodeFactory._M.get(o );
+		return _M.get(o );
 	}
 
-	public static function removeKey( o: Dynamic )
+	public function removeKey( o: Dynamic )
 	{
-		return HashCodeFactory._M.remove(o );
+		return _M.remove(o );
 	}
 
-	public static function previewNextKey() : Int
+	public function previewNextKey() : Int
 	{
-		return HashCodeFactory._nKEY;
+		return _nKEY;
 	}
 }
