@@ -1,0 +1,5 @@
+-cp tests
+-cp src
+-lib tink_core
+-main RunTests
+-dce full

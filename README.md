@@ -2,9 +2,6 @@
 Haxe caching based on tink_promise
 It wraps the original Promise with the same signature while it implements some caching logic inside itself.
 
-# Prerequirements
-- [lix](https://github.com/lix-pm/lix.client)
-
 # Install
 - `lix install gh:grosmar/tink_cache`
 - add to your build.hxml: `-lib tink_cache`
