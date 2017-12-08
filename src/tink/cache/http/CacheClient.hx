@@ -1,4 +1,4 @@
-package tink.http;
+package tink.cache.http;
 import tink.core.Future;
 import tink.core.Promise;
 import tink.cache.Cache;

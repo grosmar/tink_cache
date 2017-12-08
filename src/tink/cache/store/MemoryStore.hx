@@ -1,6 +1,6 @@
 package tink.cache.store;
 import tink.core.Promise;
-import tink.util.HashMap;
+import tink.cache.util.HashMap;
 
 //typedef MemoryStore<K,V> = HashMap<K,V>;
 

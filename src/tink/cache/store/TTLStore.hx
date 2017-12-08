@@ -1,7 +1,8 @@
 package tink.cache.store;
 import tink.core.Promise;
-import tink.util.HashMap;
+import tink.cache.util.HashMap;
 import haxe.Timer;
+
 class TTLStore<K,V>
 {
 	var ttl:Int;

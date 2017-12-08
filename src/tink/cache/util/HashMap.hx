@@ -1,4 +1,4 @@
-package tink.util;
+package tink.cache.util;
 import tink.CoreApi.Error;
 class HashMap<K, V>
 {
