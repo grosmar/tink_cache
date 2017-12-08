@@ -2,7 +2,6 @@ package tink.cache.store;
 
 import tink.CoreApi.OutcomeTools;
 import tink.core.Promise;
-import js.html.Storage;
 
 class MasterSlaveStore<K,V>
 {
