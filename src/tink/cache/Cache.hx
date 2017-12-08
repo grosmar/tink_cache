@@ -18,14 +18,14 @@ class Cache
 		return cache( memoryAndLocalStore( memoryTtl, localTtl, memoryInvalidateInterval, localInvalidateInterval ),
 					  f );
 	}
-	#end
+
 
 	public static function memoryAndLocalStore<In,Out>( memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):MasterSlaveStore<In,Out>
 	{
 		return new MasterSlaveStore( new TTLStore( new MemoryStore(), memoryTtl, memoryInvalidateInterval ),
 									 new TTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval ) );
 	}
-
+	#end
 
 	public static function ttlCache<In,Out>(?store:CacheStore<In, Out>, f:In->Promise<Out>, ttl:Int, ?invalidateInterval:Int ):In->Promise<Out>
 	{
