@@ -1,4 +1,5 @@
 package tink.cache.store;
+import tink.core.Promise;
 import tink.cache.util.HashMap;
 import haxe.Timer;
 class TTLStore<K,V>
@@ -9,34 +10,30 @@ class TTLStore<K,V>
 
 	var ttlStore:HashMap<K, Float> = new HashMap();
 
-	public function new(store:CacheStore<K,V>, ttlSec:Int, invalidateInterval:Int)
+	public function new(store:CacheStore<K,V>, ttl:Int, ?invalidateInterval:Int)
 	{
-		this.ttl = ttlSec;
+		this.ttl = ttl;
 		this.store = store;
+		invalidateInterval = invalidateInterval == null ? ttl : invalidateInterval;
 
 		this.timer = new Timer(invalidateInterval);
 		this.timer.run = this.invalidate;
 	}
 
-	public function get(key:K):Null<V>
-	return ttlStore.get(key) > Date.now().getTime() - ttl ? store.get(key) : null;
+	public function get(key:K):Null<Promise<V>>
+		return ttlStore.get(key) > Date.now().getTime() - ttl ? store.get(key) : null;
 
-	public function set(key:K, value:V):Void
+	public function set(key:K, value:Promise<V>):Void
 	{
 		store.set(key, value);
 		ttlStore.set(key, Date.now().getTime() );
 	}
 
 	public function keys():Iterator<K>
-	return store.keys();
-
-	public function exists(key:K):Bool
-	{
-		return store.exists(key) && ttlStore.get(key) >= Date.now().getTime() - ttl;
-	}
+		return store.keys();
 
 
-	public function remove(key:K):Null<V>
+	public function remove(key:K):Null<Promise<V>>
 	{
 		ttlStore.remove(key);
 		return store.remove(key);

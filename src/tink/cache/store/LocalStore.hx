@@ -1,5 +1,6 @@
 package tink.cache.store;
 
+import tink.cache.serializer.Serializer;
 import tink.core.Promise;
 import tink.json.Representation;
 import js.html.Storage;
@@ -14,12 +15,19 @@ class LocalStore<K,V>
 		store = js.Browser.getLocalStorage();
 	}
 
-	public function set(key:K, value:V):Void
+	public function set(key:K, value:Promise<V>):Void
 	{
-		store.setItem(serializer.serializeKey(key), serializer.serializeValue(value));
+		value.handle(function (o)
+					 {
+						 switch (o)
+						 {
+							 case Success(v): store.setItem(serializer.serializeKey(key), serializer.serializeValue(v));
+							 default:
+						 }
+					 });
 	}
 
-	public function get(key:K):V
+	public function get(key:K):Null<Promise<V>>
 	{
 		return serializer.parseValue(store.getItem(serializer.serializeKey(key)));
 	}
@@ -29,12 +37,7 @@ class LocalStore<K,V>
 		return [for (i in 0...store.length) serializer.parseKey(store.getItem(store.key(i)))].iterator();
 	}
 
-	public function exists(key:K):Bool
-	{
-		return store.getItem(serializer.serializeKey(key)) != null;
-	}
-
-	public function remove(key:K):Null<V>
+	public function remove(key:K):Null<Promise<V>>
 	{
 		var item = serializer.parseValue(store.getItem(serializer.serializeKey(key)));
 
@@ -43,41 +46,42 @@ class LocalStore<K,V>
 	}
 }
 
+/*
+
 abstract Serializable(String) to String from String
 {
 	public function new(v)
-		this = v;
+	this = v;
 
 	@:from static function fromBool(v:Bool)
-		return new Serializable(v ? "true" : "false");
+	return new Serializable(v ? "true" : "false");
 
 	@:to function toBool()
-		return this == "false" ? false : (this == null ? null : true);
+	return this == "false" ? false : (this == null ? null : true);
 
 	@:from static function fromFloat(v:Float)
-		return new Serializable(v + "");
+	return new Serializable(v + "");
 
 	@:to function toFloat()
-		return Std.parseFloat(this);
+	return Std.parseFloat(this);
 
 	@:from static function fromObject(v:{})
-		return new Serializable(Json.stringify(v));
+	return new Serializable(Json.stringify(v));
 
 	@:to function toObject():{}
-		return haxe.Json.parse(this);
+	return haxe.Json.parse(this);
 
 }
-
-class PromiseHandlerStore<K,V:Promise<Dynamic>>
+class PromiseHandlerStore<K,V>
 {
-	var store:CacheStore<K, Dynamic>;
+	var store:CacheStore<K, V>;
 
 	public function new(store:CacheStore<K, Dynamic>)
 	{
 		this.store = store;
 	}
 
-	public function set(key:K, value:V):Void
+	public function set(key:K, value:Promise<V>):Void
 	{
 		value.handle( function (o) switch(o)
 		{
@@ -86,7 +90,7 @@ class PromiseHandlerStore<K,V:Promise<Dynamic>>
 		});
 	}
 
-	public function get(key:K):Null<V>
+	public function get(key:K):Null<Promise<V>>
 	{
 		return store.get(key);
 	}
@@ -96,7 +100,7 @@ class PromiseHandlerStore<K,V:Promise<Dynamic>>
 		return store.keys();
 	}
 
-	public function exists(key:K):Bool
+	public function exists(key:Promise<V>):Bool
 	{
 		return store.exists(key);
 	}
@@ -105,7 +109,7 @@ class PromiseHandlerStore<K,V:Promise<Dynamic>>
 	{
 		return store.remove(key);
 	}
-}
+}*/
 
 //class JsonSerializer<K:Serializable, V>*/
 
@@ -131,34 +135,30 @@ class JsonSerializer<K:{}, V:{}>
 }
 */
 
-class JsonSerializer<K:{}, V:{}>
+/*abstract Serializable(String) to String from String
 {
-	public function new()
-	{}
+	public function new(v)
+	this = v;
 
-	public function serializeKey(key:K):String
-		return haxe.Json.stringify(key);
+	@:from static function fromBool(v:Bool)
+	return new Serializable(v ? "true" : "false");
 
-	public function serializeValue(value:V):String
-		return haxe.Json.stringify(value);
+	@:to function toBool()
+	return this == "false" ? false : (this == null ? null : true);
 
-	public function parseKey(key:String):K
-		return haxe.Json.parse(key);
+	@:from static function fromFloat(v:Float)
+	return new Serializable(v + "");
 
-	public function parseValue(value:String):V
-		return haxe.Json.parse(value);
-}
+	@:to function toFloat()
+	return Std.parseFloat(this);
 
-typedef Serializer<K,V> =
-{
-	function serializeKey(key:K):String;
+	@:from static function fromObject(v:{})
+	return new Serializable(Json.stringify(v));
 
-	function serializeValue(key:V):String;
+	@:to function toObject():{}
+	return haxe.Json.parse(this);
 
-	function parseKey(key:String):K;
-
-	function parseValue(value:String):V;
-}
+}*/
 
 /*class LocalStore<K:Serializable,V:Serializable>
 {

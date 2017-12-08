@@ -1,14 +1,13 @@
 package tink.cache.store;
 
+import tink.CoreApi.Promise;
 typedef CacheStore<K, V> =
 {
-	function set(key:K, value:V):Void;
+	function get(key:K):Null<Promise<V>>;
 
-	function get(key:K):Null<V>;
+	function set(key:K, value:Promise<V>):Void;
 
 	function keys():Iterator<K>;
 
-	function exists(key:K):Bool;
-
-	function remove(key:K):Null<V>;
+	function remove(key:K):Null<Promise<V>>;
 }

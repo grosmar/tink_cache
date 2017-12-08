@@ -1,29 +1,41 @@
 package tink.cache;
+import tink.cache.serializer.JsonSerializer;
 import tink.cache.store.MemoryStore;
 import tink.cache.store.TTLStore;
+import tink.cache.store.MasterSlaveStore;
+import tink.cache.store.LocalStore;
 import tink.cache.store.CacheStore;
 import tink.core.*;
 
 class Cache
 {
 
-	public static function ttlCache<In,Out>(?store:CacheStore<In, Promise<Out>>, f:In->Promise<Out>, ttl:Int, ?invalidateInterval:Int ):In->Promise<Out>
+	public static function memoryAndLocalCache<In,Out>( f:In->Promise<Out>, memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):In->Promise<Out>
 	{
-		var ttlStore = new TTLStore(store != null ? store : new MemoryStore<In,Promise<Out>>(), ttl, invalidateInterval);
+		return cache( new MasterSlaveStore( new TTLStore( new MemoryStore(), memoryTtl, memoryInvalidateInterval ),
+											new TTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval ) ),
+					  f );
+	}
+
+
+	public static function ttlCache<In,Out>(?store:CacheStore<In, Out>, f:In->Promise<Out>, ttl:Int, ?invalidateInterval:Int ):In->Promise<Out>
+	{
+		var ttlStore = new TTLStore(store != null ? store : new MemoryStore<In,Out>(), ttl, invalidateInterval);
 		return cache(ttlStore, f);
 	}
 
 	public static function infiniteCache<In,Out>(f:In->Promise<Out>):In->Promise<Out>
 	{
-		return cache(new MemoryStore<In,Promise<Out>>(), f);
+		return cache(new MemoryStore<In,Out>(), f);
 	}
 
-	public static function cache<In,Out>(store:CacheStore<In,Promise<Out>>, f:In->Promise<Out>):In->Promise<Out>
+	public static function cache<In,Out>(store:CacheStore<In,Out>, f:In->Promise<Out>):In->Promise<Out>
 	{
 		return function (i:In):Promise<Out>
 		{
-			if (store.exists(i))
-				return store.get(i);
+			var storedValue:Promise<Out> = cast store.get(i);
+			if (storedValue != null)
+				return storedValue;
 
 			var ret = f(i);
 
