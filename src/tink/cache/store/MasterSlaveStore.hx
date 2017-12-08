@@ -1,6 +1,5 @@
 package tink.cache.store;
 
-import tink.CoreApi.OutcomeTools;
 import tink.core.Promise;
 
 class MasterSlaveStore<K,V>
