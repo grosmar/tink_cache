@@ -1,0 +1,20 @@
+{
+  "name": "tink_cache",
+  "license": "MIT",
+  "tags": [
+    "cache",
+    "tink",
+    "thinkerbell"
+  ],
+  "classPath": "src",
+  "description": "Promise based caching layer",
+  "contributors": [
+    "grosmar"
+  ],
+  "releasenote": "initial release",
+  "version": "0.1.0",
+  "url": "https://github.com/grosmar/tink_cache/",
+  "dependencies": {
+    "tink_core": ""
+  }
+}
