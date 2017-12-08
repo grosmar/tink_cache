@@ -1,6 +1,6 @@
 package tink.cache.store;
 import tink.core.Promise;
-import tink.cache.util.HashMap;
+import tink.util.HashMap;
 import haxe.Timer;
 class TTLStore<K,V>
 {
