@@ -2,7 +2,6 @@ package tink.cache.store;
 #if js
 import tink.cache.serializer.Serializer;
 import tink.core.Promise;
-import tink.json.Representation;
 import js.html.Storage;
 class LocalStore<K,V>
 {
