@@ -1,8 +1,7 @@
 package tink.cache.store;
-
+#if js
 import tink.cache.serializer.Serializer;
 import tink.core.Promise;
-import tink.json.Representation;
 import js.html.Storage;
 using tink.CoreApi;
 
@@ -48,6 +47,7 @@ class LocalStore<K,V>
 		return item;
 	}
 }
+#end
 
 /*
 

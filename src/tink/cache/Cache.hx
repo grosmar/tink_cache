@@ -3,25 +3,29 @@ import tink.cache.serializer.JsonSerializer;
 import tink.cache.store.MemoryStore;
 import tink.cache.store.TTLStore;
 import tink.cache.store.MasterSlaveStore;
+#if js
 import tink.cache.store.LocalStore;
+#end
 import tink.cache.store.CacheStore;
 import tink.core.*;
 
 class Cache
 {
 
+	#if js
 	public static function memoryAndLocalCache<In,Out>( f:In->Promise<Out>, memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):In->Promise<Out>
 	{
 		return cache( memoryAndLocalStore( memoryTtl, localTtl, memoryInvalidateInterval, localInvalidateInterval ),
 					  f );
 	}
 
+
 	public static function memoryAndLocalStore<In,Out>( memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):MasterSlaveStore<In,Out>
 	{
 		return new MasterSlaveStore( new TTLStore( new MemoryStore(), memoryTtl, memoryInvalidateInterval ),
 									 new TTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval ) );
 	}
-
+	#end
 
 	public static function ttlCache<In,Out>(?store:CacheStore<In, Out>, f:In->Promise<Out>, ttl:Int, ?invalidateInterval:Int ):In->Promise<Out>
 	{
