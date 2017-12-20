@@ -3,6 +3,7 @@ package tink.cache.store;
 import tink.CoreApi.OutcomeTools;
 import tink.core.Promise;
 import js.html.Storage;
+using tink.CoreApi;
 
 class MasterSlaveStore<K,V>
 {
@@ -21,7 +22,7 @@ class MasterSlaveStore<K,V>
 		slaveStore.set(key, value);
 	}
 
-	public function get(key:K):Null<Promise<V>>
+	public function get(key:K):Promise<V>
 	{
 		var value = masterStore.get(key);
 		if ( value == null )
@@ -30,7 +31,7 @@ class MasterSlaveStore<K,V>
 			if ( value != null )
 				masterStore.set(key, value);
 		}
-		return value;
+		return value != null ? value : Failure(null);
 	}
 
 	public function keys():Iterator<K>

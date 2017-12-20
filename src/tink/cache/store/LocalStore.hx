@@ -4,6 +4,8 @@ import tink.cache.serializer.Serializer;
 import tink.core.Promise;
 import tink.json.Representation;
 import js.html.Storage;
+using tink.CoreApi;
+
 class LocalStore<K,V>
 {
 	var store:Storage;
@@ -29,7 +31,8 @@ class LocalStore<K,V>
 
 	public function get(key:K):Null<Promise<V>>
 	{
-		return serializer.parseValue(store.getItem(serializer.serializeKey(key)));
+		var item = serializer.parseValue(store.getItem(serializer.serializeKey(key)));
+		return item != null ? item : Failure(null);
 	}
 
 	public function keys():Iterator<K>

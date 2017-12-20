@@ -21,7 +21,7 @@ class TTLStore<K,V>
 		this.timer.run = this.invalidate;
 	}
 
-	public function get(key:K):Null<Promise<V>>
+	public function get(key:K):Promise<V>
 		return ttlStore.get(key) > Date.now().getTime() - ttl ? store.get(key) : null;
 
 	public function set(key:K, value:Promise<V>):Void
