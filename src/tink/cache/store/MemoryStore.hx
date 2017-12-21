@@ -1,6 +1,7 @@
 package tink.cache.store;
 import tink.core.Promise;
 import tink.cache.util.HashMap;
+using tink.CoreApi;
 
 //typedef MemoryStore<K,V> = HashMap<K,V>;
 
@@ -20,7 +21,7 @@ class MemoryStore<K,V>
 
 	public function get(key:K):Promise<V>
 	{
-		return store.get(key);
+		return store.exists(key) ? store.get(key) : Failure(null);
 	}
 
 	public function keys():Iterator<K>
