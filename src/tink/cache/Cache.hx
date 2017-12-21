@@ -1,4 +1,5 @@
 package tink.cache;
+import tink.cache.store.LocalTTLStore;
 import tink.cache.serializer.JsonSerializer;
 import tink.cache.store.MemoryStore;
 import tink.cache.store.TTLStore;
@@ -19,7 +20,7 @@ class Cache
 	public static function memoryAndLocalStore<In,Out>( memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):MasterSlaveStore<In,Out>
 	{
 		return new MasterSlaveStore( new TTLStore( new MemoryStore(), memoryTtl, memoryInvalidateInterval ),
-									 new TTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval ) );
+									 new LocalTTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval, new JsonSerializer() ) );
 	}
 
 
@@ -36,24 +37,32 @@ class Cache
 
 	public static function cache<In,Out>(store:CacheStore<In,Out>, f:In->Promise<Out>):In->Promise<Out>
 	{
+
 		return function (i:In):Promise<Out>
 		{
-			var storedValue:Promise<Out> = cast store.get(i);
-			if (storedValue != null)
-				return storedValue;
+			trace("Request", i);
+			return store.get(i)
+			.next( function (v)
+			{
+				trace("RequestNEXT", i);
+				return v;
+			})
+			.tryRecover( function(_)
+			{
+				trace("RequestTRY", i);
+				var ret = f(i);
 
-			var ret = f(i);
+				ret.handle( function(o)
+							switch (o)
+							{
+								case Failure(_): store.remove(i);
+								default:
+							}
+				);
 
-			ret.handle( function(o)
-				switch (o)
-				{
-					case Failure(_): store.remove(i);
-					default:
-				}
-			);
-
-			store.set(i, ret);
-			return ret;
+				store.set(i, ret);
+				return ret;
+			});
 		}
 	}
 }

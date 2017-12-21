@@ -2,6 +2,7 @@ package tink.cache.store;
 import tink.core.Promise;
 import tink.cache.util.HashMap;
 import haxe.Timer;
+using tink.CoreApi;
 
 class TTLStore<K,V>
 {
@@ -21,8 +22,9 @@ class TTLStore<K,V>
 		this.timer.run = this.invalidate;
 	}
 
+	//TODO: add ttl also if it's persisted data
 	public function get(key:K):Null<Promise<V>>
-		return ttlStore.get(key) > Date.now().getTime() - ttl ? store.get(key) : null;
+		return ttlStore.get(key) > Date.now().getTime() - ttl ? store.get(key) : Failure(null);
 
 	public function set(key:K, value:Promise<V>):Void
 	{

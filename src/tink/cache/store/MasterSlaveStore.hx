@@ -23,14 +23,16 @@ class MasterSlaveStore<K,V>
 
 	public function get(key:K):Null<Promise<V>>
 	{
-		var value = masterStore.get(key);
-		if ( value == null )
-		{
-			value = slaveStore.get(key);
-			if ( value != null )
-				masterStore.set(key, value);
-		}
-		return value;
+		return masterStore.get(key)
+		.tryRecover( function(_)
+			{
+				return slaveStore.get(key)
+				.next( function( value:V)
+					  {
+						  masterStore.set(key, value);
+						  return value;
+					  });
+			});
 	}
 
 	public function keys():Iterator<K>
