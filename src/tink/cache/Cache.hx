@@ -1,11 +1,11 @@
 package tink.cache;
-import tink.cache.store.LocalTTLStore;
 import tink.cache.serializer.JsonSerializer;
 import tink.cache.store.MemoryStore;
 import tink.cache.store.TTLStore;
 import tink.cache.store.MasterSlaveStore;
 #if js
 import tink.cache.store.LocalStore;
+import tink.cache.store.LocalTTLStore;
 #end
 import tink.cache.store.CacheStore;
 import tink.core.*;
