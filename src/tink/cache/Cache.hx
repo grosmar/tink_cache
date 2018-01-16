@@ -44,16 +44,13 @@ class Cache
 
 		return function (i:In):Promise<Out>
 		{
-			trace("Request", i);
 			return store.get(i)
 			.next( function (v)
 			{
-				trace("RequestNEXT", i);
 				return v;
 			})
 			.tryRecover( function(_)
 			{
-				trace("RequestTRY", i);
 				var ret = f(i);
 
 				ret.handle( function(o)
