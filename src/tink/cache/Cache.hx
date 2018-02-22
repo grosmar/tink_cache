@@ -14,17 +14,17 @@ class Cache
 {
 
 	#if js
-	public static function memoryAndLocalCache<In,Out>( f:In->Promise<Out>, memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):In->Promise<Out>
+	public static function memoryAndLocalCache<In,Out>( f:In->Promise<Out>, memoryTtl:Int, localTtl:Int, localStorePrefix:String, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):In->Promise<Out>
 	{
-		return cache( memoryAndLocalStore( memoryTtl, localTtl, memoryInvalidateInterval, localInvalidateInterval ),
+		return cache( memoryAndLocalStore( memoryTtl, localTtl, localStorePrefix, memoryInvalidateInterval, localInvalidateInterval ),
 					  f );
 	}
 
 
-	public static function memoryAndLocalStore<In,Out>( memoryTtl:Int, localTtl:Int, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):MasterSlaveStore<In,Out>
+	public static function memoryAndLocalStore<In,Out>( memoryTtl:Int, localTtl:Int, localStorePrefix:String, ?memoryInvalidateInterval:Int, ?localInvalidateInterval:Int ):MasterSlaveStore<In,Out>
 	{
 		return new MasterSlaveStore( new TTLStore( new MemoryStore(), memoryTtl, memoryInvalidateInterval ),
-									 new LocalTTLStore( new LocalStore( new JsonSerializer() ), localTtl, localInvalidateInterval, new JsonSerializer() ) );
+									 new LocalTTLStore( new LocalStore( new JsonSerializer(), localStorePrefix ), localTtl, localStorePrefix, localInvalidateInterval, new JsonSerializer() ) );
 	}
 	#end
 

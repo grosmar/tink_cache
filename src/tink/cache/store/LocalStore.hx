@@ -1,5 +1,5 @@
 package tink.cache.store;
-#if js
+
 import tink.cache.serializer.Serializer;
 import tink.core.Promise;
 import js.html.Storage;
@@ -7,11 +7,13 @@ using tink.CoreApi;
 
 class LocalStore<K,V>
 {
+	var prefix:String;
 	var store:Storage;
 	var serializer:Serializer<K,V>;
 
-	public function new(serializer:Serializer<K,V>)
+	public function new(serializer:Serializer<K,V>, prefix:String)
 	{
+		this.prefix = prefix + "_";
 		this.serializer = serializer;
 		store = js.Browser.getLocalStorage();
 	}
@@ -22,7 +24,7 @@ class LocalStore<K,V>
 					 {
 						 switch (o)
 						 {
-							 case Success(v): store.setItem(serializer.serializeKey(key), serializer.serializeValue(v));
+							 case Success(v): store.setItem(prefix + serializer.serializeKey(key), serializer.serializeValue(v));
 							 default:
 						 }
 					 });
@@ -30,24 +32,29 @@ class LocalStore<K,V>
 
 	public function get(key:K):Null<Promise<V>>
 	{
-		var item = serializer.parseValue(store.getItem(serializer.serializeKey(key)));
+		var item = serializer.parseValue(store.getItem(prefix + serializer.serializeKey(key)));
 		return item != null ? item : Failure(null);
 	}
 
 	public function keys():Iterator<K>
 	{
-		return [for (i in 0...store.length) serializer.parseKey(store.getItem(store.key(i)))].iterator();
+		return [for (i in 0...store.length)
+		{
+			if ( store.key(i).indexOf(prefix) != 0 )
+				continue;
+			serializer.parseKey(store.key(i).substr(prefix.length));
+		}].iterator();
 	}
 
 	public function remove(key:K):Null<Promise<V>>
 	{
 		var item = serializer.parseValue(store.getItem(serializer.serializeKey(key)));
 
-		store.removeItem(serializer.serializeKey(key));
+		store.removeItem(prefix + serializer.serializeKey(key));
 		return item;
 	}
 }
-#end
+
 
 /*
 
